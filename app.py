@@ -21,6 +21,8 @@ class MultiCommitsApp(QMainWindow):
         self.target_file = ""
         self.debug_mode = False
         self.projects_data = [] # Usaremos uma lista de dicionários ou objetos para guardar os dados dos projetos
+        self.success_copy = []
+        self.failed_copy = []
         
         # Configuração da interface
         self.setup_ui()
@@ -203,8 +205,9 @@ class MultiCommitsApp(QMainWindow):
             
         self.log_message("Iniciando processo de atualização (cópia de arquivos)...")
         
-        success_copy = []
-        failed_copy = []
+        # Limpar listas de resultados anteriores
+        self.success_copy = []
+        self.failed_copy = []
         
         # Descobrir o projeto base a partir do arquivo alvo
         project_base = None
@@ -229,21 +232,21 @@ class MultiCommitsApp(QMainWindow):
                     # Copiar o arquivo de atualização
                     shutil.copy2(self.update_file, target_path)
                     project_data["copy_status"] = "success"
-                    success_copy.append(target_path)
+                    self.success_copy.append(target_path)
                     self.log_message(f"Arquivo copiado com sucesso para: {os.path.relpath(target_path, self.projects_dir)}")
                 else:
                     project_data["copy_status"] = "failed"
-                    failed_copy.append(target_path)
+                    self.failed_copy.append(target_path)
                     self.log_message(f"Arquivo alvo não encontrado no projeto: {os.path.relpath(target_path, self.projects_dir)}")
             except Exception as e:
                 project_data["copy_status"] = "failed"
-                failed_copy.append(target_path)
+                self.failed_copy.append(target_path)
                 self.log_message(f"Erro ao copiar arquivo para {os.path.relpath(target_path, self.projects_dir)}: {type(e).__name__}: {e}")
                 
         self.log_message("\nProcesso de cópia finalizado. Por favor, revise e confirme os commits.")
         
         # Habilitar botão de confirmar commit se houver arquivos copiados com sucesso (e não estiver em debug)
-        if success_copy and not self.debug_mode:
+        if self.success_copy and not self.debug_mode:
              self.btn_confirm_commit.setEnabled(True)
 
     def confirm_commits(self):
@@ -300,11 +303,11 @@ class MultiCommitsApp(QMainWindow):
         # Gerar relatório final
         self.log_message("\n=== Relatório Final ===")
         self.log_message("\nArquivos copiados com sucesso:")
-        for file in success_copy:
+        for file in self.success_copy:
              self.log_message(f"- {os.path.relpath(file, self.projects_dir)}")
             
         self.log_message("\nArquivos com falha na cópia:")
-        for file in failed_copy:
+        for file in self.failed_copy:
             self.log_message(f"- {os.path.relpath(file, self.projects_dir)}")
             
         self.log_message("\nProjetos commitados com sucesso:")

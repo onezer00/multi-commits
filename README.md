@@ -63,13 +63,7 @@ pip install -r requirements.txt
 
 ## 📸 Interface (Screenshot)
 
-<!-- COLOQUE AQUI UMA IMAGEM ATUAL DA INTERFACE DO SEU PROJETO -->
-
-Por favor, substitua este texto com um link ou embed da sua imagem. Exemplo:
-
-```markdown
 ![Captura de tela da interface](./images/interface.png)
-```
 
 ---
 
